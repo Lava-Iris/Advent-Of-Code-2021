@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+function vents(arr) {
+            //coverting input to array
+            function make_pair(currentvalue, input) {
+                function make_point(currentvalue, point) {
+                    arr[input][point] = currentvalue.split(',').map(x => Number(x));
+                }
+                arr[input] = currentvalue.split('->');
+                arr[input].forEach(make_point);
+            }
+            arr.forEach(make_pair);
+
+            //making output array
+            let output = [];
+            for (let i = 0; i < 1000; i++) {
+                output[i] = [];
+            }
+
+            //processing input
+            function process(input) {
+                const x1 = input[0][0];
+                const x2 = input[1][0];
+                const y1 = input[0][1];
+                const y2 = input[1][1];
+                const bigger = (a, b) => a > b ? a : b;
+                const smaller = (a, b) => a < b ? a : b;
+                function increase(y, x) {
+                    if (output[y][x] === undefined) {
+                        output[y][x] = 1;
+                    } else {
+                        output[y][x] = output[y][x] + 1;
+                    }
+                }
+                if (y1 === y2) {
+                    for (let x = smaller(x1, x2); x <= bigger(x1, x2); x++) {
+                        increase(y1, x);
+                    }
+                } else if (x1 === x2) {
+                    for (let y = smaller(y1, y2); y <= bigger(y1, y2); y++) {
+                        increase(y, x1);
+                    }
+                } 
+            }
+            arr.forEach(process)
+            
+            //counting the number of 2s and more
+            let count = 0;
+            for (let i = 0; i < output.length; i++) {
+                for (let j = 0; j < output[i].length; j++) {
+                    if (output[i][j] === undefined) {
+                        continue;
+                    } else if (output[i][j] >= 2) {
+                        count = count + 1;
+                    }
+                }
+            }
+            return count;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=vents(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

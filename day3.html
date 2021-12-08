@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+function gamma(arr) {
+  let result = "";
+  for (let  i = 0; i < 12; i++) {
+      let zeroes = 0;
+      let ones = 0;
+    for (let  j = 0; j < arr.length; j++) {
+      if (arr[j].charAt(i) === "0") {
+        zeroes = zeroes + 1;
+      } else {
+        ones = ones + 1;
+      }
+    }
+    if (zeroes > ones) {
+      result = result + "0";
+    } else {
+      result = result + "1";
+    }
+  }
+  return result;
+}
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=gamma(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
