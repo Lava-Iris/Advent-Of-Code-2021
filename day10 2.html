@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+function syntax(arr) {
+            const is_closing = character => character === ')' || character === ']' || character === '}' || character === '>';
+            const closing = character => character === '('
+                                        ? ')'
+                                        : character === '{'
+                                        ? '}'
+                                        : character === '['
+                                        ? ']'
+                                        : '>';
+
+            function correct(line) {
+                let corruption = false;
+                let open = '';
+                function helper(character) {
+                    if (!is_closing(character)) {
+                        open = open.concat(character);
+                    } else if (character === closing(open.charAt(open.length - 1))) {
+                        open = open.slice(0, open.length - 1);
+                    } else {
+                        corruption = true;
+                    }
+                }
+                for (let i = 0; i < line.length; i++) {
+                    if (corruption !== false){
+                        break;
+                    } else {
+                      helper(line.charAt(i));
+                    }
+                }
+                return corruption
+                        ? 'corrupted'
+                        : open;
+            }
+            
+            //removes the corrupted lines
+            arr = arr.filter(x => correct(x) !== 'corrupted');
+            function score(str) {
+              let score = 0;
+              const point_value = character => character === '('
+                                        ? 1
+                                        : character === '{'
+                                        ? 3
+                                        : character === '['
+                                        ? 2
+                                        : 4;
+              for (let i = str.length - 1; i >= 0; i--) {
+                score = score * 5 + point_value(str.charAt(i));
+              }
+              return score;
+            }
+
+            return arr.map(x => Number(score(correct(x)))).sort((a, b) => a - b)[Math.ceil(arr.length/2) - 1];
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=syntax(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
