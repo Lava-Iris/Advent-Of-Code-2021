@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+function origami(str) {
+            const input = str.split('\n\n');
+            const input_dots = input[0].split('\n');
+            const input_instructions = input[1].split('\n');
+            function seperate(seperator) {
+                return (currentvalue, index, arr) => {arr[index] = currentvalue.split(seperator);}
+            }
+            input_dots.forEach(seperate(','));
+            input_instructions.forEach(seperate('='))
+
+            let paper = [];
+            input_dots.forEach(element => {
+                const x = element[0];
+                const y = element[1];
+                if (paper[y] ===  undefined) {
+                    paper[y] = [];
+                }
+                paper[y][x] = 1;
+            });
+
+            function fold(instructions) {
+                const folding_line = Number(instructions[1]);
+                const folding_direction = instructions[0].charAt(instructions[0].length - 1);
+
+                if (folding_direction === 'x') {
+                    for (let y = 0; y < paper.length; y++) {
+                        if (paper[y] === undefined) {
+                            continue;
+                        } else {
+                            for (let i = 1; i < paper[y].length - folding_line; i++) {
+                                if (paper[y][folding_line + i] === 1){
+                                    paper[y][folding_line - i] = 1;
+                                    paper[y][folding_line + i] = undefined;
+                                }
+                            }
+                        }
+                    }
+                    for (let i = 1; i < paper.length - folding_line; i++) {
+                        
+                    }
+                } else {
+                    for (let j = 1; j < paper.length - folding_line; j++) {
+                      
+                        if (paper[folding_line + j] === undefined) {
+                            continue;
+                        } else {
+                            if (paper[folding_line - j] === undefined) {
+                                paper[folding_line - j] = [];
+                            }
+                            for (let x = 0; x < paper[folding_line + j].length; x++) {
+                                if (paper[folding_line + j][x] === 1) {
+                                    paper[folding_line - j][x] = 1;
+                                    paper[folding_line + j][x] = undefined;
+                                }
+                            }
+                        }
+                    }
+                }
+                return folding_direction
+            }
+            fold(input_instructions[0]);
+
+            let count = 0;
+            paper.forEach(row => {
+                if (row !== undefined) {
+                    row.forEach(element => {
+                        if (element === 1) {
+                            count++
+                        }
+                    })
+                }
+            });
+            return count;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=origami(fr.result);
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
