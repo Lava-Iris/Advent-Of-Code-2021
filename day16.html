@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function packet_decoder(packet) {
+            const keys = ['0 = 0000', '1 = 0001', '2 = 0010', '3 = 0011', '4 = 0100', '5 = 0101', '6 = 0110', '7 = 0111', '8 = 1000', 
+            '9 = 1001', 'A = 1010', 'B = 1011', 'C = 1100', 'D = 1101', 'E = 1110', 'F = 1111'];
+            function hexadecimal_convertor(hexadecimal) {
+                let binary = '';
+                for (let i = 0; i < hexadecimal.length; i++) {
+                    const key = keys.find(key => key.charAt(0) === hexadecimal.charAt(i));
+                    binary = binary + key.slice(4);
+                }
+                return binary;
+            }
+
+            function binary_convertor(binary) {
+                let number = 0;
+                let exp = 1;
+                for (let i = binary.length - 1; i >= 0; i--) {
+                    number = number + binary.charAt(i) * exp;
+                    exp = exp * 2;
+                }
+                return number;
+            }
+
+            const binary_packet = hexadecimal_convertor(packet);
+            let versions = [];
+            let numbers = [];
+            let position = 0;
+            
+            function decode(packet) {
+                const version = binary_convertor(packet.slice(0, 3));
+                versions.push(version)
+                position = position + 3;
+                const type_ID = binary_convertor(packet.slice(3, 6));
+                position = position + 3
+                
+                if (type_ID === 4) {
+                    let number = '';
+                    let pos = 6;
+                    function get_number() {
+                        if (packet.charAt(pos) === '1') {
+                            number = number + packet.slice(pos + 1, pos + 5);
+                            pos = pos + 5;
+                            get_number();
+                        } else {
+                            number = number + packet.slice(pos + 1, pos + 5);
+                            pos = pos + 5;
+                        }
+                    }
+                    get_number();
+                    numbers.push(binary_convertor(number));
+                    position = position + pos - 6;
+                } else {
+                    const length_ID = packet.charAt(6);
+                    position = position + 1;
+                    if (length_ID === '0') {
+                        const length = binary_convertor(packet.slice(7, 22));
+                        position = position + 15;
+                        const starting_position = position;
+                        function helper() {
+                            if (position - starting_position < length) {
+                                decode(binary_packet.slice(position));
+                                helper();
+                            }
+                        }
+                        helper();
+                    } else {
+                        const no_of_packets = binary_convertor(packet.slice(7, 18));
+                        position = position + 11;
+                        for (let i = 0; i < no_of_packets; i++) {
+                            decode(binary_packet.slice(position));
+                        }
+                    }
+                }
+            }
+            decode(binary_packet);
+
+            function getSum(total, num) {
+                return total + num;
+            }
+            return versions.reduce(getSum, 0);
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=packet_decoder(fr.result);
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
