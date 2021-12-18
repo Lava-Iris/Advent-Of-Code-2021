@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function snailfish_addition(str) {
+            let arr = str.split('\n');
+            function add(number1, number2) {
+                let number = '[' + number1 + ',' + number2 + ']';
+                function reduce() {
+                    let open_pairs = 0;
+                    function explode(pos) {
+                        //pos
+                        let left = number.slice(0, pos);
+                        let right = number.slice(pos + 5);
+                        for (let i = left.length - 1; i >= 0; i--) {
+                            if (!isNaN(left.charAt(i))) {
+                                const new_number1 = (Number(left.charAt(i)) + Number(number.charAt(pos + 1))).toString();
+                                left = left.slice(0, i) + new_number1 + left.slice(i + 1);
+                                break;
+                            }
+                        }
+                        for (let i = 0; i < right.length; i++) {
+                            if (!isNaN(right.charAt(i))) {
+                                const new_number2 = (Number(right.charAt(i)) + Number(number.charAt(pos + 3))).toString();
+                                right = right.slice(0, i) + new_number2 + right.slice(i + 1);
+                                break;
+                            }
+                        }
+                        number = left + 0 + right;
+                        reduce();
+                    }
+                    function split(pos) {
+                        let left = number.slice(0, pos);
+                        let right = number.slice(pos + 2);
+                        const half = Number(number.slice(pos, pos + 2)) / 2 
+                        const new_pair = '[' + Math.floor(half).toString() + ',' + Math.ceil(half).toString() + ']';
+                        number = left + new_pair + right;
+                    }
+                    for (let i = 0; i < number.length; i++) {
+                      //console.log(number.charAt(i), open_pairs)
+                        if (number.charAt(i) === '[') {
+                            if (open_pairs === 4) {
+                              console.log(number, i)
+                                explode(i);
+                            } else {
+                                open_pairs++;
+                            }
+                        } else if (number.charAt(i) === ']') {
+                            open_pairs--;
+                        } else if (number.charAt(i) === '1' && !isNaN(number.charAt(i + 1))) {
+                          console.log(number, i)
+                            split(i);
+                        }
+                    }
+                }
+                reduce();
+                return number;
+            }
+
+            const sum = arr.reduce(add);
+
+            return sum;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=snailfish_addition(fr.result);
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
