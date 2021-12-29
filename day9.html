@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function lavalamps(arr) {
+            //making 2d array 
+            function seperate(currentvalue, index) {
+                arr[index] = currentvalue.split('');
+            }
+            arr.forEach(seperate);
+
+            //making an arr of low points
+            let low_points = [];
+            function check(x, y) {
+                const is_less = (a, b) => arr[x + a] === undefined || arr[x + a][y + b] === undefined || arr[x + a][y + b] > arr[x][y];
+                if ( is_less(1, 0) && is_less(-1, 0) && is_less(0, 1) && is_less(0, -1)) {
+                    low_points.push(arr[x][y]);
+                }
+            }
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr[i].length; j++) {
+                    check(i, j);
+                }
+            }
+
+            //summing the array of low points
+            let sum = 0;
+            function summing(x) {
+                sum = sum + Number(x);
+            }
+            low_points.forEach(summing);
+            return sum + low_points.length;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=lavalamps(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

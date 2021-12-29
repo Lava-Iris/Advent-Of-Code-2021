@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function polymerization(str) {
+            const input = str.split('\n\n');
+            const polymer_template = input[0].split('');
+            const insertion_rules = input[1].split('\n');
+            function seperate(seperator) {
+                return (currentvalue, index, arr) => {arr[index] = currentvalue.split(seperator);}
+            }
+            insertion_rules.forEach(seperate(' -> '))
+
+            function step(initial_polymer, n) {
+                let output = [initial_polymer[0]];
+                for (let i = 0; i < initial_polymer.length - 1; i++) {
+                    const rule = insertion_rules.find(rule => rule[0] === initial_polymer[i] + initial_polymer[i + 1]);
+                    if (rule !== undefined) {
+                        output.push(rule[1], initial_polymer[i + 1])
+                    } else {
+                        output.push(initial_polymer[i + 1])
+                    }
+                }
+                return n === 1 ? output : step(output, n - 1);
+            }
+
+            const polymer = step(polymer_template, 10);
+
+            const alphabets = [];
+            const count = [];
+            polymer.forEach(element => {
+                let index = alphabets.findIndex(alphabet => alphabet === element)
+                if (index === -1) {
+                    alphabets.push(element)
+                    index = alphabets.length - 1
+                } 
+                count[index] = isNaN(count[index])
+                            ? 1
+                            : count[index] + 1;
+                
+            });
+            const max = count.reduce((max, num) => num > max ? num : max, 0);
+            const min = count.reduce((min, num) => num < min ? num : min, Infinity);
+            return max - min;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=polymerization(fr.result);
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

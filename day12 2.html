@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function path(arr) {
+            arr.forEach((element, index) => {
+                arr[index] = element.split('-');
+            });
+
+            const is_capital = str => str.toLowerCase() !== str;
+
+            let paths = 0;
+            let restarted = false;
+            let exception = false;
+            let small_caves_visited = [];
+            function next_cave(current_cave) {
+                const connections = arr.filter(entry => entry.includes(current_cave)).map(entry => entry.find(x => x !== current_cave));
+                let small_caves = [...small_caves_visited];
+                let except = exception;
+                function move(cave) {
+                    if (cave === 'end') {
+                        restarted = true;
+                        paths++;
+                    } else if (cave === 'start'){
+            
+                    } else if (is_capital(cave)) {
+                        return next_cave(cave)
+                    } else {
+                        if (!small_caves_visited.includes(cave)) {
+                            small_caves_visited.push(cave);
+                            return next_cave(cave);
+                        } else if (exception === false && small_caves_visited.indexOf(cave) === small_caves_visited.lastIndexOf(cave)) {
+                            exception = true;
+                            small_caves_visited.push(cave);
+                            return next_cave(cave);
+                        }
+                    }
+                }
+
+                connections.forEach(x => {
+                    if (restarted === true) {
+                        small_caves_visited = [...small_caves];
+                        exception = except;
+                    } 
+                    move(x);
+                });
+            }
+
+            next_cave('start');
+            return paths;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=path(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

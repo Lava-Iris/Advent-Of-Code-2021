@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+      function display(arr) {
+        function seperate(entry, index) {
+          //to seperate input and output in each entry
+          function value(put, index2) {
+            //to seperate each signal pattern
+            arr[index][index2] = put.split(' ').filter(x => x !== "");
+          }
+          arr[index] = entry.split('|');
+          arr[index].forEach(value);
+        }
+        arr.forEach(seperate);
+
+        function same(value1, value2) {
+            //checks whether 2 values are same
+            function check() {
+                let truth = true;
+                for (let i = 0; i < value1.length; i++) {
+                    truth = truth && value2.includes(value1.charAt(i))
+                }
+                return truth;
+            }
+            return value1.length === value2.length && check();
+        }
+
+        function remove(str1, str2) {
+            //removes str1 from str2
+            let ans = '';
+            for (let i = 0; i < str2.length; i++) {
+                if (str1.includes(str2.charAt(i)) === false) {
+                  ans = ans + str2.charAt(i);
+                }
+            }
+            return ans;
+        }
+
+        function decode(entry) {
+            // h1
+            //v1 v2
+            // h2
+            //v3 v4
+            // h3
+            const one = entry[0].filter(x => x.length === 2)[0];
+            const four = entry[0].filter(x => x.length === 4)[0];
+            const seven = entry[0].filter(x => x.length === 3)[0];
+            const eight = entry[0].filter(x => x.length === 7)[0];
+            const h1 = remove(one, seven);
+            const nine = entry[0].filter(x => x.length === 6).filter(x => remove(x, four) === '')[0];
+            const v3 = remove(nine, eight);
+            const h3 = remove(h1, remove(four, nine));
+            const zero = entry[0].filter(x => x.length === 6).filter(x => !same(x, nine)).filter(x => remove(x, one) === '')[0];
+            const h2 = remove(zero, eight);
+            const three = one + h1 + h2 + h3;
+            const six = entry[0].filter(x => x.length === 6).filter(x => !same(x, nine) && !same(x, zero))[0];
+            const v1 = remove(three, nine);
+            const five = entry[0].filter(x => x.length === 5).filter(x => remove(x, v1) === '')[0];
+            const two = entry[0].filter(x => x.length === 5).filter(x => !same(x, three) && !same(x, five))[0];
+
+            const decoder = x => same(x, one) 
+                                ? 1
+                                : same(x, two) 
+                                ? 2
+                                : same(x, three)
+                                ? 3
+                                : same(x, four)
+                                ? 4
+                                : same(x, five)
+                                ? 5
+                                : same(x, six)
+                                ? 6
+                                : same(x, seven)
+                                ? 7
+                                : same(x, eight)
+                                ? 8
+                                : same(x, nine)
+                                ? 9
+                                : 0
+                                
+            const output_value = entry[1].map(decoder);
+            return output_value[0] * 1000 + output_value[1] * 100 + output_value[2] * 10 + output_value[3];
+        }
+        const outputs = arr.map(decode)
+
+        //to get sum of output values
+        let sum = 0;
+        function summing(x) {
+            sum = sum + x;
+        }
+        outputs.forEach(summing);
+        return sum;
+      }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=display(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

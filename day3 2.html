@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+function lf(arr) {
+  function ogr(arr) {
+  let result = "";
+  function helper(arr, bitpos) {
+      let zeroes = 0;
+      let ones = 0;
+      let filtered = [];
+    for (let  j = 0; j < arr.length; j++) {
+      if (arr[j].charAt(bitpos) === "0") {
+        zeroes = zeroes + 1;
+      } else {
+        ones = ones + 1;
+      }
+    }
+    if (zeroes > ones) {
+      filtered = arr.filter(x => x.charAt(bitpos) === "0");
+    } else {
+      filtered = arr.filter(x => x.charAt(bitpos) === "1");
+    }
+    return filtered.length === 1 ? filtered[0] : helper(filtered, bitpos + 1)
+  }
+  return helper(arr, 0);
+}
+
+const ogrno = ogr(arr);
+
+function csr(arr) {
+  let result = "";
+  function helper(arr, bitpos) {
+      let zeroes = 0;
+      let ones = 0;
+      let filtered = [];
+    for (let  j = 0; j < arr.length; j++) {
+      if (arr[j].charAt(bitpos) === "0") {
+        zeroes = zeroes + 1;
+      } else {
+        ones = ones + 1;
+      }
+    }
+    if (zeroes <= ones) {
+      filtered = arr.filter(x => x.charAt(bitpos) === "0");
+    } else {
+      filtered = arr.filter(x => x.charAt(bitpos) === "1");
+    }
+    return filtered.length === 1 ? filtered[0] : helper(filtered, bitpos + 1)
+  }
+  return helper(arr, 0);
+}
+const csrno = csr(arr);
+return parseInt(ogrno, 2) * parseInt(csrno, 2)
+}
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=lf(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

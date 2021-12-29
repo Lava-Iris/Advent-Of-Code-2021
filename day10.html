@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function syntax(arr) {
+            const is_closing = character => character === ')' || character === ']' || character === '}' || character === '>';
+            const closing = character => character === '('
+                                        ? ')'
+                                        : character === '{'
+                                        ? '}'
+                                        : character === '['
+                                        ? ']'
+                                        : '>';
+            let corrupted = [0, 0, 0, 0];
+            function is_corrupted(line) {
+                let corruption = false;
+                let open = '';
+                function helper(character) {
+                    if (!is_closing(character)) {
+                        open = open.concat(character);
+                    } else if (character === closing(open.charAt(open.length - 1))) {
+                        open = open.slice(0, open.length - 1);
+                    } else {
+                        corruption = character;
+                    }
+                }
+                for (let i = 0; i < line.length; i++) {
+                    if (corruption !== false){
+                        if (corruption === ')') {
+                            corrupted[0] = corrupted[0] + 1;
+                        } else if (corruption === ']') {
+                            corrupted[1] = corrupted[1] + 1;
+                        } else if (corruption === '}') {
+                            corrupted[2] = corrupted[2] + 1;
+                        } else {
+                            corrupted[3] = corrupted[3] + 1;
+                        }
+                        break;
+                    } else {
+                      helper(line.charAt(i));
+                    }
+                }
+            }
+            arr.forEach(is_corrupted);
+            return corrupted[0] * 3 + corrupted[1] * 57 + corrupted[2] * 1197 + corrupted[3] * 25137;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=syntax(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

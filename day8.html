@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+      function count1478(arr) {
+        function seperate(entry, index) {
+          //to seperate input and output in each entry
+          function value(put, index2) {
+            //to seperate each signal pattern
+            arr[index][index2] = put.split(' ').filter(x => x !== "");
+          }
+          arr[index] = entry.split('|');
+          arr[index].forEach(value);
+        }
+        arr.forEach(seperate);
+
+        let count = 0;
+        function counting(entry) {
+          function check_length(value) {
+            if (value.length === 2 || value.length === 3 || value.length === 4 || value.length === 7) {
+              count = count + 1;
+            }
+          }
+          entry[1].forEach(check_length)
+        }
+        arr.forEach(counting)
+        return count;
+      }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=count1478(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

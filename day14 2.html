@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function polymerization(str) {
+            const input = str.split('\n\n');
+            const polymer_template = input[0];
+            const insertion_rules = input[1].split('\n');
+            function seperate(seperator) {
+                return (currentvalue, index, arr) => {arr[index] = currentvalue.split(seperator);}
+            }
+            insertion_rules.forEach(seperate(' -> '))
+            
+            let pairs = [];
+            function reduce(str, arr, increase) {
+                const index = insertion_rules.findIndex(rule => rule[0] === str);
+                arr[index] = isNaN(arr[index])
+                            ? increase
+                            : arr[index] + increase;
+            }
+
+            for (let i = 0; i < polymer_template.length - 1; i++) {
+                reduce(polymer_template.slice(i, i + 2), pairs, 1);
+            }
+
+            function step(n) {
+                if (n !== 0) {
+                    let new_pairs = [];
+                    pairs.forEach((number, index) => {
+                        const new_pair1 = insertion_rules[index][0].charAt(0) + insertion_rules[index][1];
+                        const new_pair2 = insertion_rules[index][1] + insertion_rules[index][0].charAt(1);
+                        reduce(new_pair1, new_pairs, number);
+                        reduce(new_pair2, new_pairs, number);
+                    })
+                    pairs = new_pairs;
+                    step(n - 1);
+                }
+            }
+            step(40);
+
+            let alphabets = [];
+            let count = [];
+            function addcount(element, increase) {
+                    let index = alphabets.findIndex(alphabet => alphabet === element)
+                    if (index === -1) {
+                        alphabets.push(element)
+                        index = alphabets.length - 1
+                    } 
+                    count[index] = isNaN(count[index])
+                            ? increase
+                            : count[index] + increase;  
+            }   
+            pairs.forEach((number, index) => {
+                const element1 = insertion_rules[index][0].charAt(0);
+                const element2 = insertion_rules[index][0].charAt(1);   
+                
+                addcount(element1, number);
+                addcount(element2, number);   
+            })
+
+            //we've counted all elements except the first and the last twice
+            addcount(polymer_template.charAt(0), 1);
+            addcount(polymer_template.charAt(polymer_template.length - 1), 1)
+            count = count.map(x => x /2)
+            const max = count.reduce((max, num) => num > max ? num : max, 0);
+            const min = count.reduce((min, num) => num < min ? num : min, Infinity);
+            return max - min;
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=polymerization(fr.result);
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>

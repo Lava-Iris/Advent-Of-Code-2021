@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Read Text File</title>
+</head>
+  
+<body>
+    <input type="file" name="inputfile"
+            id="inputfile">
+    <br>
+   
+    <pre id="output"></pre>
+      
+    <script type="text/javascript">
+
+        function lavalamps(arr) {
+            //making 2d array 
+            function seperate(currentvalue, index) {
+                arr[index] = currentvalue.split('');
+            }
+            arr.forEach(seperate);
+
+            let visited = [];
+            for (let i = 0; i < arr.length; i++) {
+                visited[i] = [];
+            }
+            
+            let basin_sizes = [];
+            let basin_size = 0;
+            function visit(x, y) {
+                basin_size = basin_size + 1;
+                console.log(x, y);
+                visited[x][y] = true;
+                const nsew = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                function check(a, b) {
+                    if (arr[a] !== undefined && arr[a][b] !== undefined && visited[a][b] !== true && arr[a][b] !== '9'){
+                        visit(a, b);
+                    }                
+                } 
+                for (let i = 0; i < 4; i++) {
+                    check(x + nsew[i][0], y + nsew[i][1]);
+                }
+            }
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr[i].length; j++) {
+                    if (arr[i][j] !== '9' && visited[i][j] !== true) {
+                        visit(i, j);
+                        basin_sizes.push(basin_size);
+                        basin_size = 0;
+                    }
+                }
+            }
+
+            let max_three = [0, 0, 0];
+            function find_max(currentvalue) {
+                if (currentvalue > max_three[2]) {
+                    max_three[0] = max_three[1];
+                    max_three[1] = max_three[2];
+                    max_three[2] = currentvalue;
+                } else if (currentvalue > max_three[1]) {
+                    max_three[0] = max_three[1];
+                    max_three[1] = currentvalue;
+                } else if (currentvalue > max_three[0]) {
+                    max_three[0] = currentvalue;
+                }
+            }
+            basin_sizes.forEach(find_max);
+            return max_three[0] * max_three[1] *  max_three[2];
+        }
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                document.getElementById('output')
+                        .textContent=lavalamps(fr.result.split('\n'));
+            }
+              
+            fr.readAsBinaryString(this.files[0]);
+        })
+    </script>
+</body>
+  
+</html>
